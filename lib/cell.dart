@@ -16,9 +16,6 @@ class Cell {
     }
     coloredCircle = original.coloredCircle;
   }
-      // : solders =
-      //       original.solders.map((solder) => Solder.copy(solder)).toList(),
-      //   coloredCircle = original.coloredCircle;
 
   bool containsWall() {
     return solders.length >= 2;

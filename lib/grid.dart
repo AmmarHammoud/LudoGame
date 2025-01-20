@@ -160,43 +160,15 @@ class Grid {
 
   Grid();
 
-  // Grid({required List<List<Cell>> grid, required int currentPlayerIndex})
-  //     : _grid = grid,
-  //       _currentPlayerIndex = currentPlayerIndex;
-
   Grid.copy({
-    required List<List<Cell>> grid,
+    required List<List<Cell>> pGrid,
     required int currentPlayerIndex,
     required List<Player> players,
   }) {
-    _grid = List.generate(
-      _rows,
-      (i) => List.generate(
-        _columns,
-        (j) => Cell(
-            coloredCircle: grid[i][j].coloredCircle,
-            solders: grid[i][j].solders),
-      ),
-    );
-    _currentPlayerIndex = currentPlayerIndex;
-    _players = [];
-    for (var player in players) {
-      _players.add(
-        Player(
-          name: player.name,
-          coloredCircle: player.coloredCircle,
-          playingArea: player.playingArea,
-          winningArea: player.winningArea,
-          startingPoint: player.startingPoint,
-          endingPoint: player.endingPoint,
-          headOfInitialArea: player.headOfInitialArea,
-        ),
-      );
-    }
+    _grid = pGrid.map((row) => row.map((cell) => Cell.copy(cell)).toList()).toList();
+    currentPlayerIndex = currentPlayerIndex;
+    players = players.map((p) => Player.copy(p)).toList();
   }
-
-  // : _grid = grid.map((row) => row.map((cell) => Cell.copy(cell)).toList()).toList(),
-  //   _currentPlayerIndex = currentPlayerIndex;
 
   List<Player> get players {
     return _players;
@@ -333,6 +305,7 @@ class Grid {
       return;
     }
 
+    stdout.write('Solder.x: ${solder.x}, Solder.y: ${solder.y}; ${_grid[solder.x][solder.y].solders}\n');
     _grid[solder.x][solder.y].solders.removeLast();
     pos += steps;
     solder.x = player.playingArea[pos].x;

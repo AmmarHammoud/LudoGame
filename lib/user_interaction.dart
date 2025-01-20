@@ -4,14 +4,11 @@ import 'package:ludo/possible_moves/possible_moves.dart';
 import 'grid.dart';
 import 'possible_moves/get_a_solder.dart';
 import 'possible_moves/move_a_solder.dart';
-import 'solder.dart';
 
 abstract class UserInteraction {
   static late final Map<String, Function> _objectToFunction;
 
   static late final Map<int, String> _intToObject;
-
-  // static late final Grid grid;
 
   static void init({required Grid grid}) {
     // grid = grid;

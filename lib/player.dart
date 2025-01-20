@@ -15,7 +15,7 @@ class Player {
   late Pair _headOfInitialArea;
   late List<Pair> winningArea;
   late ColoredCircles coloredCircle;
-  late final List<Solder> solders = [];
+  late List<Solder> solders = [];
   late List<Pair> playingArea;
 
   Player({
@@ -42,18 +42,19 @@ class Player {
         ));
       }
     }
-    // solders = [
-    //   Solder(name: name, color: coloredCircle, x: -1, y: -1),
-    //   Solder(name: name, color: coloredCircle, x: -1, y: -1),
-    //   Solder(name: name, color: coloredCircle, x: -1, y: -1),
-    //   Solder(name: name, color: coloredCircle, x: -1, y: -1),
-    // ];
-    // for(int i = headOfInitialArea.x; i < headOfInitialArea.x + 4; i++){
-    //   for(int j = headOfInitialArea.y; j < headOfInitialArea.y + 4; j++){
-    //     constCells[Pair(x: i, y: j).toString()] = Cell(coloredCircle: coloredCircle);
-    //   }
-    // }
   }
+
+  Player.copy(Player original)
+      : name = original.name,
+        soldersOnInitialArea = original.soldersOnInitialArea,
+        soldersInWinningArea = original.soldersInWinningArea,
+        _startingPoint = Pair.copy(original._startingPoint),
+        _endingPoint = Pair.copy(original._endingPoint),
+        _headOfInitialArea = Pair.copy(original._headOfInitialArea),
+        coloredCircle = original.coloredCircle,
+        playingArea = original.playingArea.map((p) => Pair.copy(p)).toList(),
+        winningArea = original.winningArea.map((p) => Pair.copy(p)).toList(),
+        solders = original.solders.map((s) => Solder.copy(s)).toList();
 
   int generateRandomNumber() {
     return Random().nextInt(6) + 1;
@@ -67,7 +68,9 @@ class Player {
     return _startingPoint;
   }
 
-  Pair get endingPoint{return _endingPoint;}
+  Pair get endingPoint {
+    return _endingPoint;
+  }
 
   @override
   bool operator ==(covariant Player other) {
