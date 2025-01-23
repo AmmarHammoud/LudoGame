@@ -164,10 +164,14 @@ class Grid {
     required List<List<Cell>> pGrid,
     required int currentPlayerIndex,
     required List<Player> players,
+    required int randomValue,
   }) {
-    _grid = pGrid.map((row) => row.map((cell) => Cell.copy(cell)).toList()).toList();
+    _grid = pGrid
+        .map((row) => row.map((cell) => Cell.copy(cell)).toList())
+        .toList();
     currentPlayerIndex = currentPlayerIndex;
     players = players.map((p) => Player.copy(p)).toList();
+    randomVal = randomValue;
   }
 
   List<Player> get players {
@@ -221,6 +225,7 @@ class Grid {
                 coloredCircle: ColoredCircles.brown,
               )),
     );
+    print();
 
     ///Actual playing area
     for (var cell in Constants.actualPlayingArea) {
@@ -232,10 +237,12 @@ class Grid {
       for (var p in player.winningArea) {
         _grid[p.x][p.y] = Cell(coloredCircle: player.coloredCircle);
       }
+      print();
 
       ///coloring the starting point of each player
       _grid[player.startingPoint.x][player.startingPoint.y] =
           Cell(coloredCircle: player.coloredCircle);
+      print();
 
       ///coloring the initial area of each player
       _fillPlayerArea(player: player);
@@ -246,6 +253,7 @@ class Grid {
     required Player player,
     required Solder solder,
     required int steps,
+    bool debug = false,
   }) {
     late int pos;
     for (int i = 0; i < player.playingArea.length; i++) {
@@ -255,62 +263,67 @@ class Grid {
         break;
       }
     }
-    if (pos + steps >= player.playingArea.length) {
-      printRed('Out of the range.\n');
-    }
-    for (int i = pos + 1; i < pos + steps; i++) {
-      if (_grid[player.playingArea[i].x][player.playingArea[i].y]
-              .containsWall() &&
-          _grid[player.playingArea[i].x][player.playingArea[i].y]
-                  .coloredCircle !=
-              player.coloredCircle) {
-        printRed('You cannot pass a wall\n');
-        return;
-      }
-    }
+    // if (pos + steps >= player.playingArea.length) {
+    //   printRed('Out of the range.\n');
+    // }
+    // for (int i = pos + 1; i < pos + steps; i++) {
+    //   if (_grid[player.playingArea[i].x][player.playingArea[i].y]
+    //           .containsWall() &&
+    //       _grid[player.playingArea[i].x][player.playingArea[i].y]
+    //               .coloredCircle !=
+    //           player.coloredCircle) {
+    //     printRed('You cannot pass a wall\n');
+    //     return;
+    //   }
+    // }
     //if the last cell of the path contains a wall, you can kill it
-    if (_grid[player.playingArea[pos + steps].x]
-                [player.playingArea[pos + steps].y]
-            .containsWall() &&
-        _grid[player.playingArea[pos + steps].x]
-                    [player.playingArea[pos + steps].y]
-                .coloredCircle !=
-            player.coloredCircle) {
-      var currentCell = _grid[player.playingArea[pos + steps].x]
-          [player.playingArea[pos + steps].y];
-      //get the opposite color
-      late Player opposite;
-      for (var player in _players) {
-        if (player.coloredCircle == currentCell.coloredCircle) {
-          opposite = player;
-        }
-      }
-      //send the wall to its initial area
-      opposite.soldersOnInitialArea += currentCell.solders.length;
+    // if (_grid[player.playingArea[pos + steps].x]
+    //             [player.playingArea[pos + steps].y]
+    //         .containsWall() &&
+    //     _grid[player.playingArea[pos + steps].x]
+    //                 [player.playingArea[pos + steps].y]
+    //             .coloredCircle !=
+    //         player.coloredCircle) {
+    //   var currentCell = _grid[player.playingArea[pos + steps].x]
+    //       [player.playingArea[pos + steps].y];
+    //   //get the opposite color
+    //   late Player opposite;
+    //   for (var player in _players) {
+    //     if (player.coloredCircle == currentCell.coloredCircle) {
+    //       opposite = player;
+    //     }
+    //   }
+    //   //send the wall to its initial area
+    //   opposite.soldersOnInitialArea += currentCell.solders.length;
+    //
+    //   //update the coordinates of each solder to its initial state
+    //   for (var solder in currentCell.solders) {
+    //     solder.returnToInitialPos();
+    //   }
+    //
+    //   //clear the solders on the current cell
+    //   currentCell.solders.clear();
+    //
+    //   //add the new current solder
+    //   currentCell.solders.add(solder);
+    //
+    //   for (var cell in Constants.safeCells) {
+    //     if (cell.x == solder.x && cell.y == solder.y) solder.isSafe = true;
+    //   }
+    //   return;
+    // }
 
-      //update the coordinates of each solder to its initial state
-      for (var solder in currentCell.solders) {
-        solder.returnToInitialPos();
-      }
-
-      //clear the solders on the current cell
-      currentCell.solders.clear();
-
-      //add the new current solder
-      currentCell.solders.add(solder);
-
-      for (var cell in Constants.safeCells) {
-        if (cell.x == solder.x && cell.y == solder.y) solder.isSafe = true;
-      }
-      return;
-    }
-
-    stdout.write('Solder.x: ${solder.x}, Solder.y: ${solder.y}; ${_grid[solder.x][solder.y].solders}\n');
+    // stdout.write(
+    //     'Solder.x: ${solder.x}, Solder.y: ${solder.y}; ${_grid[solder.x][solder.y].solders}\n');
+    // if(_grid[solder.x][solder.y].solders.isEmpty) return;
+    // if (_grid[solder.x][solder.y].solders.isNotEmpty)
+    if (debug) printBlue('solder before editing: ${player.solders}\n');
     _grid[solder.x][solder.y].solders.removeLast();
     pos += steps;
     solder.x = player.playingArea[pos].x;
     solder.y = player.playingArea[pos].y;
     _grid[solder.x][solder.y].solders.add(solder);
+    if (debug) printBlue('solder after  editing: ${player.solders}\n');
     for (var cell in Constants.safeCells) {
       if (cell.x == solder.x && cell.y == solder.y) solder.isSafe = true;
     }
@@ -328,7 +341,7 @@ class Grid {
   }
 
   void getASolderToGrid({required Player player}) {
-    if (player.soldersOnInitialArea < 0) return;
+    if (player.soldersOnInitialArea <= 0) return;
     player.soldersOnInitialArea--;
     _clearSolderOnInitialArea(player.headOfInitialArea);
     var solder = player.solders.removeAt(0);
@@ -360,7 +373,10 @@ class Grid {
     // return true;
   }
 
-  List<PossibleMoves> getPossibleMoves({required int currentRandomValue}) {
+  List<PossibleMoves> getPossibleMoves({
+    required int currentRandomValue,
+    bool debug = false,
+  }) {
     List<PossibleMoves> possibleMoves = [];
     var currentPlayer = _players[currentPlayerIndex];
 
@@ -379,14 +395,24 @@ class Grid {
       if (currentPlayer.soldersOnInitialArea > 0) {
         ///getting another solder
         possibleMoves.add(GetASolder());
+      }
 
-        ///move one of the current
-        possibleMoves.add(MoveASolder());
-      } else {
-        possibleMoves.add(MoveASolder());
+      for (var solder in currentPlayer.solders) {
+        if (debug) stdout.write('$solder\n');
+        if (solder.notOnInitialPos()) {
+          possibleMoves
+              .add(MoveASolder(solder: solder, steps: currentRandomValue));
+        }
       }
     } else {
-      possibleMoves.add(MoveASolder());
+      // possibleMoves.add(MoveASolder());
+      for (var solder in currentPlayer.solders) {
+        if (debug) stdout.write('$solder\n');
+        if (solder.notOnInitialPos()) {
+          possibleMoves
+              .add(MoveASolder(solder: solder, steps: currentRandomValue));
+        }
+      }
     }
     return possibleMoves;
   }
@@ -402,36 +428,149 @@ class Grid {
     return evaluation;
   }
 
-  void _play({int currentPlayerIndex = 0}) {
-    _currentPlayerIndex = currentPlayerIndex;
-    if (aPlayerHasWon()) return;
-    var currentPlayer = _players[currentPlayerIndex];
-    int randomValue = currentPlayer.generateRandomNumber();
-    randomVal = randomValue;
-    printBlue(
-        'current player is ${currentPlayer.name}, playing with random number: $randomValue\n');
-    // print();
-
-    var possibleMoves = getPossibleMoves(currentRandomValue: randomValue);
-    // stdout.write('POSSIBLE MOVES: $possibleMoves\n');
-
-    var neighbors = LudoSolve.generateNeighbors(
-      currentState: State(grid: this),
-      possibleMoves: possibleMoves,
-    );
-
-    if (currentPlayerIndex == 0) {
-      stdout.write('neighbors:\n');
-      stdout.write('$neighbors\n');
-      UserInteraction.printUserOptions(possibleMoves);
-      if (possibleMoves.isNotEmpty) UserInteraction.executeUserOption(grid: this);
+  void applyMove({
+    required PossibleMoves move,
+    required Player player,
+    bool debug = false,
+  }) {
+    if (move is GetASolder) {
+      getASolderToGrid(player: player);
+      return;
+    } else if (move is MoveASolder) {
+      moveSolder(player: player, solder: move.solder!, steps: move.steps!);
+      return;
     }
-    if (randomValue == 6 && _sixCount <= 3) {
-      _sixCount++;
-      _play(currentPlayerIndex: currentPlayerIndex);
-    } else {
-      _sixCount = 0;
-      _play(currentPlayerIndex: ++currentPlayerIndex % 4);
+    // switch (move) {
+    //   case GetASolder():
+    //     getASolderToGrid(player: player);
+    //     return;
+    //   case MoveASolder():
+    //     moveSolder(
+    //       player: player,
+    //       solder: move.solder!,
+    //       steps: move.steps!,
+    //       debug: debug,
+    //     );
+    //     return;
+    // }
+  }
+
+  // void _play({int currentPlayerIndex = 0}) {
+  //   _currentPlayerIndex = currentPlayerIndex;
+  //   if (aPlayerHasWon()) return;
+  //   var currentPlayer = _players[currentPlayerIndex];
+  //   int randomValue = currentPlayer.generateRandomNumber();
+  //   randomVal = randomValue;
+  //   printBlue(
+  //       'current player is ${currentPlayer.name}, playing with random number: $randomValue\n');
+  //   // print();
+  //
+  //   var possibleMoves = getPossibleMoves(currentRandomValue: randomValue);
+  //
+  //   var neighbors = LudoSolve.applyRandomNumberOutcome(
+  //     currentState: State(grid: this),
+  //     randomValue: randomVal,
+  //   );
+  //
+  //   if (currentPlayerIndex == 0) {
+  //     stdout.write('neighbors:\n');
+  //     stdout.write('$neighbors\n');
+  //     UserInteraction.printUserOptions(possibleMoves);
+  //     if (possibleMoves.isNotEmpty) {
+  //       UserInteraction.executeUserOption(grid: this);
+  //     }
+  //   }
+  //
+  //   int sol = LudoSolve.solve(
+  //       currentState: State(grid: this),
+  //       depth: 10,
+  //       isChance: false,
+  //       player: _players[currentPlayerIndex]);
+  //   printRed('SOLVE VALUE WITH DEPTH 10: $sol\n');
+  //
+  //   if (randomValue == 6 && _sixCount <= 3) {
+  //     _sixCount++;
+  //     _play(currentPlayerIndex: currentPlayerIndex);
+  //   } else {
+  //     _sixCount = 0;
+  //     _play(currentPlayerIndex: ++currentPlayerIndex % 4);
+  //   }
+  // }
+
+  void _play({int currentPlayerIndex = 0, int debugInt = 30}) {
+    while (!aPlayerHasWon() && debugInt != 0) {
+      // debugInt--;
+      _currentPlayerIndex = currentPlayerIndex;
+      var currentPlayer = _players[currentPlayerIndex];
+      int randomValue = currentPlayer.generateRandomNumber();
+      randomVal = randomValue;
+
+      printBlue(
+          'Current player: ${currentPlayer.name}, random value: $randomValue\n');
+      // print(includeBars: false, includeDashes: false);
+
+      // printGreen('solder of ${currentPlayer.name} BEFORE GET MOVES: ${currentPlayer.solders}\n');
+
+      var possibleMoves = getPossibleMoves(currentRandomValue: randomValue);
+
+      stdout.write(
+          'Possible moves for player \'${currentPlayer.name}\': $possibleMoves\n');
+
+      // User interaction for player
+      if (currentPlayerIndex == 5) {
+        // stdout.write('Neighbors:\n$neighbors\n');
+        UserInteraction.printUserOptions(possibleMoves);
+        if (possibleMoves.isNotEmpty) {
+          UserInteraction.executeUserOption(grid: this);
+        }
+      } else if (possibleMoves.isNotEmpty) {
+        var bestMove = LudoSolve.findBestMove(
+          currentState: State(grid: this),
+          depth: 5,
+          isChance: false,
+          player: currentPlayer,
+        );
+
+        printCyan(
+            'best move for player ${_players[currentPlayerIndex].name} is: $bestMove\n');
+
+        // the best move is the move should be done,
+        // so it doesn't make sense to apply the best move as the best move
+        // is the state that the grid should become
+        // so if the the move should be done is MoveASolder, then it is already made by the returned value
+        // so you should subtract randomVal then apply
+
+        // subtract
+        if (bestMove is MoveASolder) {
+          var solder = bestMove.solder;
+          late int pos;
+          for (int i = 0; i < currentPlayer.playingArea.length; i++) {
+            if (currentPlayer.playingArea[i].x == solder!.x &&
+                currentPlayer.playingArea[i].y == solder.y) {
+              pos = i;
+              break;
+            }
+          }
+          pos -= randomVal;
+          bestMove.solder!.x = currentPlayer.playingArea[pos].x;
+          bestMove.solder!.y = currentPlayer.playingArea[pos].y;
+          printYellow('solder to be moved: $solder\n');
+        }
+
+        applyMove(player: currentPlayer, move: bestMove, debug: true);
+
+        print(includeDashes: false, includeBars: false);
+
+        printGreen('${currentPlayer.solders}\n');
+      }
+
+      // Handle six roll and move to the next player
+      if (randomValue == 6 && possibleMoves.isNotEmpty && _sixCount < 3) {
+        _sixCount++;
+      } else {
+        _sixCount = 0;
+        currentPlayerIndex = (currentPlayerIndex + 1) % 4;
+      }
     }
   }
 

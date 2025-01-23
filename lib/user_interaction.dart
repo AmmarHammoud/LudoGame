@@ -11,7 +11,6 @@ abstract class UserInteraction {
   static late final Map<int, String> _intToObject;
 
   static void init({required Grid grid}) {
-    // grid = grid;
     _objectToFunction = {
       GetASolder().toString(): _getSolderToGrid,
       MoveASolder().toString(): _moveSolder,
@@ -44,8 +43,8 @@ abstract class UserInteraction {
     int userInput = _readUserInput();
     var obj = _intToObject[userInput];
     _objectToFunction[obj]!(grid: grid);
-    stdout.write('Original:\n');
-    grid.print(includeBars: false, includeDashes: false);
+    // stdout.write('Original:\n');
+    // grid.print(includeBars: false, includeDashes: false);
   }
 
   static void _getSolderToGrid({required Grid grid}) {
